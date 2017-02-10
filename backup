@@ -10,7 +10,7 @@ fi
 function restore {
   aws s3api get-object --bucket $S3BUCKET --key $FILE /backup/$FILE --region $AWS_REGION
   tar -zxvf /backup/$FILE -C /backup
-  mongorestore -h $MONGO_HOST -p $MONGO_PORT $MONGO_CRED dump/
+  mongorestore -h $MONGO_HOST -p $MONGO_PORT $MONGO_CRED $RESTORE_OPTIONS dump/ 
   echo "Cleaning up..."
   rm -rf dump/ /backup/$FILE
 }
@@ -59,7 +59,7 @@ if [ "$1" == "backup" ]; then
   FILENAME=$FILEPREFIX$DATE.tar.gz
   FILE=/backup/backup-$FILENAME
 
-  mongodump -v -h $MONGO_HOST -p $MONGO_PORT $MONGO_CRED $DB_ARG
+  mongodump -v -h $MONGO_HOST -p $MONGO_PORT $DUMP_OPTIONS $MONGO_CRED $DB_ARG
   tar -zcvf $FILE dump/
   aws s3api put-object --bucket $S3BUCKET --key $FILENAME --body $FILE --region $AWS_REGION
   echo "Cleaning up..."
