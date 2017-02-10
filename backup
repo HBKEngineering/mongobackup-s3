@@ -61,7 +61,7 @@ if [ "$1" == "backup" ]; then
 
   mongodump -h $MONGO_HOST -p $MONGO_PORT $MONGO_CRED $DB_ARG
   tar -zcvf $FILE dump/
-  aws s3api put-object --bucket $S3BUCKET --key $FILENAME --body $FILE
+  aws s3api put-object --bucket $S3BUCKET --key $FILENAME --body $FILE --region $AWS_REGION
   echo "Cleaning up..."
   rm -rf dump/ $FILE
 elif [ "$1" == "list" ]; then
