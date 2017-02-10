@@ -8,7 +8,7 @@ fi
 
 
 function restore {
-  aws s3api get-object --bucket $S3BUCKET --key $FILE /backup/$FILE
+  aws s3api get-object --bucket $S3BUCKET --key $FILE /backup/$FILE --region $AWS_REGION
   tar -zxvf /backup/$FILE -C /backup
   mongorestore -h $MONGO_HOST -p $MONGO_PORT $MONGO_CRED dump/
   echo "Cleaning up..."
@@ -67,11 +67,11 @@ if [ "$1" == "backup" ]; then
 elif [ "$1" == "list" ]; then
   echo "Listing backups..."
 
-  aws s3api list-objects --bucket $S3BUCKET --query 'Contents[].{Key: Key, Size: Size}' --output table
+  aws s3api list-objects --bucket $S3BUCKET --query 'Contents[].{Key: Key, Size: Size}' --output table --region $AWS_REGION
 elif [ "$1" == "latest" ]; then
   echo "Determining backup to restore..."
 
-  : ${FILE:=$(aws s3 ls s3://$S3BUCKET | awk -F " " '{print $4}' | grep ^$FILEPREFIX | sort -r | head -n1)}
+  : ${FILE:=$(aws s3 ls s3://$S3BUCKET --region $AWS_REGION | awk -F " " '{print $4}' | grep ^$FILEPREFIX | sort -r | head -n1)}
   echo "Restoring $FILE."
   restore
 else
